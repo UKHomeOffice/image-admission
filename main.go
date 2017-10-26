@@ -2,8 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
+
+	"github.com/orendo/gin-tokenauth"
+	"github.com/orendo/gin-tokenauth/filestore"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -29,6 +33,11 @@ func main() {
 			Usage:  "listen ip:port",
 			EnvVar: "LISTEN",
 			Value:  ":8000",
+		},
+		cli.StringFlag{
+			Name:   "tokens-file",
+			Usage:  "path to tokens file for Bearer token-based authentication",
+			EnvVar: "TOKENS_FILE",
 		},
 		cli.StringFlag{
 			Name:   "dbhost",
@@ -66,6 +75,16 @@ func main() {
 			EnvVar: "DBSSLMODE",
 			Value:  "disable",
 		},
+		cli.StringFlag{
+			Name:   "certfile",
+			Usage:  "TLS certificate file name",
+			EnvVar: "CERTFILE",
+		},
+		cli.StringFlag{
+			Name:   "keyfile",
+			Usage:  "TLS certificate private key file name",
+			EnvVar: "KEYFILE",
+		},
 	}
 
 	app.Action = func(ctx *cli.Context) error {
@@ -94,13 +113,26 @@ func main() {
 
 		r.GET("/images", getImages(db))
 		r.GET("/images/:id", getImages(db))
-		r.PUT("/images", putImage(db))
-		r.DELETE("/images/:id", deleteImage(db))
 
+		authorized := r.Group("/")
+		if f := ctx.String("tokens-file"); f != "" {
+			store, err := filestore.New(f)
+			if err != nil {
+				log.Fatalln(err)
+			}
+			authorized.Use(tokenauth.New(store))
+		}
+
+		authorized.PUT("/images", putImage(db))
+		authorized.DELETE("/images/:id", deleteImage(db))
+
+		if ctx.String("certfile") != "" && ctx.String("keyfile") != "" {
+			return r.RunTLS(ctx.String("listen"), ctx.String("certfile"), ctx.String("keyfile"))
+		}
 		return r.Run(ctx.String("listen"))
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 }
