@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/fsnotify/fsnotify"
+  packages = ["."]
+  revision = "629574ca2a5df945712d3079857300b5e4da0236"
+  version = "v1.4.2"
+
+[[projects]]
   branch = "master"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
@@ -17,7 +23,7 @@
   branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "130e6b02ab059e7b717a096f397c5b60111cae74"
+  revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
@@ -35,7 +41,7 @@
   branch = "master"
   name = "github.com/lib/pq"
   packages = [".","hstore","oid"]
-  revision = "456514e2defec52e0cd37f90ccf17ec8b28295e2"
+  revision = "b609790bd85edf8e9ab7e0f8912750a786177bcf"
 
 [[projects]]
   name = "github.com/mattn/go-isatty"
@@ -45,9 +51,15 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/orendo/gin-tokenauth"
+  packages = [".","filestore"]
+  revision = "7422375db2c8281d3149b6d58ee1e826748a4386"
+
+[[projects]]
+  branch = "master"
   name = "github.com/ugorji/go"
   packages = ["codec"]
-  revision = "bdcc60b419d136a85cdf2e7cbcac34b3f1cd6e57"
+  revision = "459bba837a9de7a4d9c58fa5a1171a2a3c96d0d0"
 
 [[projects]]
   name = "github.com/urfave/cli"
@@ -59,7 +71,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "8dbc5d05d6edcc104950cc299a1ce6641235bc86"
+  revision = "80ad69fa329a43e6f28c61c48325527739bb1560"
 
 [[projects]]
   name = "gopkg.in/go-playground/validator.v8"
@@ -76,6 +88,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b1404ee8e3bc2f19a39618f46d816089913b2fc231d50aef5792752dd5cc9bfb"
+  inputs-digest = "0777229f1dfae64d0e17b59ee2587adae96655fce5a3b6cfb232408c65426aa7"
   solver-name = "gps-cdcl"
   solver-version = 1
