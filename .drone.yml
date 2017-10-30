@@ -1,0 +1,60 @@
+---
+workspace:
+  base: /go
+  path: src/github.com/${DRONE_REPO}
+
+pipeline:
+  test:
+    image: golang:1.9
+    commands:
+      - wget -q https://github.com/golang/dep/releases/download/v0.3.2/dep-linux-amd64 -O /bin/dep && chmod +x /bin/dep
+      - dep ensure
+      - go vet $(go list ./... | grep -v /vendor)
+      - go build $(go list ./... | grep -v /vendor)
+
+  build_binaries:
+    image: golang:1.9
+    commands:
+      - GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/imagelist_linux_amd64
+      - GOOS=linux GOARCH=386 CGO_ENABLED=0 go build -o bin/imagelist_linux_386
+      - GOOS=linux GOARCH=arm CGO_ENABLED=0 go build -o bin/imagelist_linux_arm
+      - GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -o bin/imagelist_darwin_amd64
+      - GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o bin/imagelist_windows_amd64.exe
+    when:
+      event: tag
+
+  latest_image:
+    image: docker:17.10
+    environment:
+      - DOCKER_HOST=tcp://172.17.0.1:2375
+    secrets: [docker_password]
+    commands:
+      - docker build -t quay.io/ukhomeofficedigital/imagelist:latest .
+      - docker login -u="ukhomeofficedigital+imagelist" -p=$${DOCKER_PASSWORD} quay.io
+      - docker push quay.io/ukhomeofficedigital/imagelist:latest
+    when:
+      event: push
+      branch: master
+
+  tagged_image:
+    image: docker:17.10
+    environment:
+      - DOCKER_HOST=tcp://172.17.0.1:2375
+    secrets: [docker_password]
+    commands:
+      - docker build -t quay.io/ukhomeofficedigital/imagelist:$${DRONE_TAG} .
+      - docker login -u="ukhomeofficedigital+imagelist" -p=$${DOCKER_PASSWORD} quay.io
+      - docker push quay.io/ukhomeofficedigital/imagelist:$${DRONE_TAG}
+    when:
+      event: tag
+
+  publish_release:
+    image: plugins/github-release
+    secrets:
+      - github_token
+    checksum:
+      - sha256
+    files:
+      - 'bin/*'
+    when:
+      event: tag
