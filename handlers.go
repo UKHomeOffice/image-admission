@@ -15,7 +15,7 @@ type Image struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 	ID        string         `json:"id" binding:"required" gorm:"primary_key;type:varchar(64)"`
 	Name      string         `json:"name" binding:"required" form:"name"`
-	Tags      pq.StringArray `json:"tags,omitempty" gorm:"type:varchar(100)[]" form:"tags"`
+	Tags      pq.StringArray `json:"tags,omitempty" gorm:"type:varchar(100)" form:"tags"`
 }
 
 func getImages(db *gorm.DB) gin.HandlerFunc {

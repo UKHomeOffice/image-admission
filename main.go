@@ -67,7 +67,7 @@ func main() {
 			Name:   "dbname",
 			Usage:  "database name",
 			EnvVar: "DBNAME",
-			Value:  "imageadmission",
+			Value:  "imagelist",
 		},
 		cli.StringFlag{
 			Name:   "dbsslmode",
@@ -88,44 +88,13 @@ func main() {
 	}
 
 	app.Action = func(ctx *cli.Context) error {
-		dbConnString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s host=%s port=%s",
-			ctx.String("dbuser"),
-			ctx.String("dbpassword"),
-			ctx.String("dbname"),
-			ctx.String("dbsslmode"),
-			ctx.String("dbhost"),
-			strconv.Itoa(ctx.Int("dbport")),
-		)
-
-		db, err := gorm.Open("postgres", dbConnString)
+		db, err := setupDB(ctx)
 		if err != nil {
 			return err
 		}
 		defer db.Close()
 
-		db.LogMode(ctx.Bool("debug"))
-
-		if err := db.AutoMigrate(&Image{}).Error; err != nil {
-			return err
-		}
-
-		r := gin.Default()
-
-		r.GET("/images", getImages(db))
-		r.GET("/images/:id", getImages(db))
-
-		authorized := r.Group("/")
-		if f := ctx.String("tokens-file"); f != "" {
-			store, err := filestore.New(f)
-			if err != nil {
-				log.Fatalln(err)
-			}
-			authorized.Use(tokenauth.New(store))
-		}
-
-		authorized.PUT("/images", putImage(db))
-		authorized.DELETE("/images/:id", deleteImage(db))
-
+		r := newRouter(ctx.String("tokens-file"), db)
 		if ctx.String("certfile") != "" && ctx.String("keyfile") != "" {
 			return r.RunTLS(ctx.String("listen"), ctx.String("certfile"), ctx.String("keyfile"))
 		}
@@ -135,4 +104,45 @@ func main() {
 	if err := app.Run(os.Args); err != nil {
 		log.Fatalln(err)
 	}
+}
+
+func setupDB(ctx *cli.Context) (*gorm.DB, error) {
+	dbConnString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=%s host=%s port=%s",
+		ctx.String("dbuser"),
+		ctx.String("dbpassword"),
+		ctx.String("dbname"),
+		ctx.String("dbsslmode"),
+		ctx.String("dbhost"),
+		strconv.Itoa(ctx.Int("dbport")),
+	)
+
+	db, err := gorm.Open("postgres", dbConnString)
+	if err != nil {
+		return db, err
+	}
+
+	db.LogMode(ctx.Bool("debug"))
+
+	return db, db.AutoMigrate(&Image{}).Error
+}
+
+func newRouter(tokensFile string, db *gorm.DB) *gin.Engine {
+	r := gin.Default()
+
+	r.GET("/images", getImages(db))
+	r.GET("/images/:id", getImages(db))
+
+	authorized := r.Group("/")
+	if tokensFile != "" {
+		store, err := filestore.New(tokensFile)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		authorized.Use(tokenauth.New(store))
+	}
+
+	authorized.PUT("/images", putImage(db))
+	authorized.DELETE("/images/:id", deleteImage(db))
+
+	return r
 }

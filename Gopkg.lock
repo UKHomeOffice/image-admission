@@ -27,7 +27,7 @@
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
-  packages = [".","dialects/postgres"]
+  packages = [".","dialects/postgres","dialects/sqlite"]
   revision = "5174cc5c242a728b435ea2be8a2f7f998e15429b"
   version = "v1.0"
 
@@ -50,6 +50,12 @@
   version = "v0.0.3"
 
 [[projects]]
+  name = "github.com/mattn/go-sqlite3"
+  packages = ["."]
+  revision = "5160b48509cf5c877bc22c11c373f8c7738cdb38"
+  version = "v1.3.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/orendo/gin-tokenauth"
   packages = [".","filestore"]
@@ -66,6 +72,12 @@
   packages = ["."]
   revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
   version = "v1.20.0"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = ["context"]
+  revision = "c73622c77280266305273cb545f54516ced95b93"
 
 [[projects]]
   branch = "master"
@@ -88,6 +100,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "0777229f1dfae64d0e17b59ee2587adae96655fce5a3b6cfb232408c65426aa7"
+  inputs-digest = "500b91cc25bfb524093cbf151bbc28ac3b8ca1e404840747367bda1774d1f2bf"
   solver-name = "gps-cdcl"
   solver-version = 1
