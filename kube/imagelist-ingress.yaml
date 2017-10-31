@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: imagelist-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx-internal"
+spec:
+  rules:
+  - host: imagelist.testing.homeoffice.gov.uk
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: imagelist
+          servicePort: 5432 

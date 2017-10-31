@@ -58,3 +58,17 @@ pipeline:
       - 'bin/*'
     when:
       event: tag
+
+
+  rollout_testing:
+    image: quay.io/ukhomeofficedigital/kd:v0.3.1
+    secrets:
+      - kube_server_acp_testing
+      - kube_token_acp_testing
+    environment:
+      - DRONE_DEPLOY_TO=testing
+    commands:
+      - ./bin/deploy.sh
+    when:
+      event: push
+      branch: master

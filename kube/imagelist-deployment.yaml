@@ -1,0 +1,18 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: imagelist-deploy
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: imagelist-deploy
+    spec:
+      containers:
+        - name: imagelist
+          image: quay.io/ukhomeofficedigital/imagelist:v0.0.1-test
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5432
