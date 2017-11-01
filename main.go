@@ -118,7 +118,7 @@ func setupDB(ctx *cli.Context) (*gorm.DB, error) {
 
 	db, err := gorm.Open("postgres", dbConnString)
 	if err != nil {
-		return db, err
+		return db, fmt.Errorf("database error: %v", err)
 	}
 
 	db.LogMode(ctx.Bool("debug"))
@@ -129,6 +129,7 @@ func setupDB(ctx *cli.Context) (*gorm.DB, error) {
 func newRouter(tokensFile string, db *gorm.DB) *gin.Engine {
 	r := gin.Default()
 
+	r.GET("/health/ping", getHealth(db))
 	r.GET("/images", getImages(db))
 	r.GET("/images/:id", getImages(db))
 

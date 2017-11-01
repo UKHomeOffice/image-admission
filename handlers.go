@@ -112,3 +112,15 @@ func deleteImage(db *gorm.DB) gin.HandlerFunc {
 
 	return gin.HandlerFunc(fn)
 }
+
+func getHealth(db *gorm.DB) gin.HandlerFunc {
+	fn := func(c *gin.Context) {
+		if err := db.Exec(`SELECT version();`).Error; err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		c.Status(http.StatusOK)
+	}
+
+	return gin.HandlerFunc(fn)
+}

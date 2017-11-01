@@ -158,6 +158,18 @@ Optional: `Authorization: Bearer <token>`
 }
 ```
 
+### Get health
+
+Checks database connection.
+
+**HTTP Request**
+
+`GET /health/ping`
+
+**Response**
+
+`HTTP/1.1 200 OK`
+
 
 ## Development
 
